@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponse
 
-def home_test(request):
+def home_test(_):
+    """Temporary: test home page"""
     return HttpResponse("there is nothing here for now... :/")
 
 urlpatterns = [
