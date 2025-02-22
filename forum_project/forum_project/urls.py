@@ -17,6 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponse
+from users.views import RegisterView, VerifyEmailView
 
 def home_test(request):
     return HttpResponse("there is nothing here for now... :/")
@@ -24,4 +25,6 @@ def home_test(request):
 urlpatterns = [
     path('', home_test),
     path('admin/', admin.site.urls),
+    path('register/', RegisterView.as_view(), name='register'),
+    path('verify-email/', VerifyEmailView.as_view(), name='verify_email'),
 ]
