@@ -20,17 +20,14 @@ class RegisterView(APIView):
 
             token = default_token_generator.make_token(user)
 
-            # Get the current domain (this would be your domain, e.g., example.com)
-            # current_site = get_current_site(request).domain
-
-            # Create the verification URL for us use localhost now
-            verification_url = f"http://127.0.0.1:8000/verify-email/?token={token}&email={user.email}"
+            current_site = get_current_site(request).domain
+            verification_url = f"http://{current_site}{reverse('verify_email')}?token={token}&email={user.email}"
             
        
             send_mail(
                 'Email Verification',
                 f'Click the link to verify your email: {verification_url}',
-                'workexample706@gmail.com', 
+                settings.EMAIL_HOST_USER, 
                 [user.email],  
                 fail_silently=False,
             )

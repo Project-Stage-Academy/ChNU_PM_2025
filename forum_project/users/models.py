@@ -1,6 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from datetime import datetime
+from django.utils.timezone import now
+from django.core.validators import RegexValidator
+
+
+ukraine_phone_regex = RegexValidator(
+    regex=r'^\+380\d{9}$',
+    message="Phone number must be in the format: '+380XXXXXXXXX' (total 13 characters)."
+)
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
@@ -14,24 +22,24 @@ class CustomUserManager(BaseUserManager):
         
         # Set password and registration date
         user.set_password(password)
-        user.registration_date = datetime.now()  # You can customize this field as needed
-        user.is_active = False  # Default is inactive until verified
+        user.registration_date = now()  
+        user.is_active = False  
         user.save(using=self._db)
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        # Ensure superuser has staff and admin rights
+       
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_active', True)
         return self.create_user(email, password, **extra_fields)
 
 class MyUser(AbstractBaseUser, PermissionsMixin):
-    id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True, max_length=255)
     first_name = models.CharField(max_length=100)
     last_name = models.CharField(max_length=100)
-    profile_img_url = models.CharField(max_length=1000, blank=True, default="")
-    phone = models.CharField(max_length=13, blank=True, null=True)
+    profile_img_url = models.URLField(blank=True, default="")
+    phone = models.CharField(validators=[ukraine_phone_regex], max_length=13, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False) 

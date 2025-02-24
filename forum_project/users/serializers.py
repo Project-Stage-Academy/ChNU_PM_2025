@@ -11,18 +11,17 @@ logger = logging.getLogger(__name__)
 MyUser = get_user_model()
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     confirm_password = serializers.CharField(write_only=True, required=True)
     phone = serializers.CharField(required=False, allow_blank=True)
 
     class Meta:
         model = MyUser
         fields = ['email', 'first_name', 'last_name', 'phone', 'password', 'confirm_password']
-        extra_kwargs = {'password': {'write_only': True}}
+        extra_kwargs = {'password': {'write_only': True}, 'confirm_password': {'write_only': True}}
 
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:
-            raise serializers.ValidationError({"password": "Passwords do not match"})
+            raise serializers.ValidationError({'confirm_password': "Passwords do not match"})
         return attrs
 
     def create(self, validated_data):
@@ -38,11 +37,12 @@ class RegisterSerializer(serializers.ModelSerializer):
             email=validated_data.pop('email'),
             first_name=validated_data.pop('first_name'),
             last_name=validated_data.pop('last_name'),
-            password=validated_data.pop('password'),
+            # password=validated_data.pop('password'),
             **validated_data 
             
         )
 
+        user.set_password(validated_data.pop('password'))
         user.is_active = False  # User needs to verify email
         user.save()
 
