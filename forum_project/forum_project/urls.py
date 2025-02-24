@@ -17,12 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponse
+from users.views import SignInView
+
 
 def home_test(_):
     """Temporary: test home page"""
     return HttpResponse("there is nothing here for now... :/")
 
+
 urlpatterns = [
-    path('', home_test),
-    path('admin/', admin.site.urls),
+    path('signin/', SignInView.as_view(), name='signin'),
 ]
