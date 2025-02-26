@@ -9,6 +9,10 @@ from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from .serializers import RegisterSerializer
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.exceptions import TokenError
+from django.db.utils import IntegrityError
+from .models import BlacklistedToken
 
 
 class RegisterView(APIView):
@@ -57,3 +61,24 @@ class VerifyEmailView(APIView):
                 return Response({"message": "Invalid or expired token"}, status=400)
 
         return Response({"message": "Invalid request"}, status=400)
+    
+
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            token = request.auth  
+            if not token:
+                return Response({"error": "No token provided"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            if BlacklistedToken.objects.filter(token=str(token)).exists():
+                return Response({"error": "Token already blacklisted"}, status=status.HTTP_400_BAD_REQUEST)
+
+            BlacklistedToken.objects.create(token=str(token))
+
+            return Response({"message": "Successfully logged out"}, status=status.HTTP_200_OK)
+        except TokenError:
+            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

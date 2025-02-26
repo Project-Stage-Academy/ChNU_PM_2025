@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-i*gs%^e!g2_eu&#=221ny^8=p@@yc8!!w!+oi%=)2tod+6sdj5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 # Application definition
 
@@ -37,13 +37,15 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     #
-    'django.contrib.sites',
-    #
     'users',
     'profiles',
     'projects',
     'communications',
     'dashboard',
+    #
+    'rest_framework', 
+    'rest_framework_simplejwt',  
+    'rest_framework_simplejwt.token_blacklist',  
 ]
 
 MIDDLEWARE = [
@@ -76,13 +78,22 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'forum_project.wsgi.application'
 
-
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / "db.sqlite3",
     }
+}
+
+SIMPLE_JWT = {
+    'BLACKLIST_AFTER_ROTATION': True,  
+    'ROTATE_REFRESH_TOKENS': True,     
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 
