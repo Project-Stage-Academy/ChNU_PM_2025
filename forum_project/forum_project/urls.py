@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from django.http import HttpResponse
 from users.views import RegisterView, VerifyEmailView
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 def home_test(_):
     """Temporary: test home page"""
@@ -28,4 +30,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/', RegisterView.as_view(), name='register'),
     path('verify-email/', VerifyEmailView.as_view(), name='verify_email'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]
